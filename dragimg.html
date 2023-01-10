@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ch">
+    <head>
+        <meta charset="UTF-8">
+        <title>在浏览器的页面中随意拖拽图片</title>
+        <style type="text/css">
+            *{
+                margin: 0;
+                padding: 0;
+            }
+            #img1{
+                width: 150px;
+                position: absolute;
+                left: 120px;
+                top: 120px;
+            }
+        </style>
+        <script type="text/javascript">
+            window.onload = function () {
+                var img = document.getElementById("img1");
+                dragImg(img);
+            };
+            //设计一个专门用来拖拽图片的函数  obj参数 就是待拖拽的元素
+            function dragImg(obj) {
+                //理清逻辑 当鼠标的指针剪头在待拖拽的元素的上方按下是 开始进行拖拽
+                obj.onmousedown = function (event){
+                    //为了兼容IE8  下面这行代码表示你有这个就执行
+                    //浏览器有一个默认行为 就是你选种的元素有一个拖拽的效果 拉到导航栏中可以搜索的那个捕获ta
+                    obj.setCaptue && obj.setCaptue();
+                    //也是为了兼容IE8 window.event(IE8) 它的事件对象属性在window中
+                    event = event || window.event;
+                    //获取偏移量 保持鼠标的指针 不动  offsetLeft返回当前元素左上角相对于 HTMLElement.offsetParent节点的左边界偏移的像素值。
+                    //偏移量 offset
+                    var ox = event.clientX - obj.offsetLeft;
+                    var oy = event.clientY - obj.offsetTop;
+                    //开始进行鼠标的移动 然后图片的移动
+                    document.onmousemove = function (event) {
+                        event = event ||window.event;
+                        //当鼠标移动时 被拖拽元素跟移动
+                        //获取鼠标的二维坐标
+                        var left = event.clientX - ox;
+                        var top = event.clientY - oy;
+
+                        //修改图片的位置
+                        obj.style.left = left +"px";
+                        obj.style.top = top +"px";
+                    };
+                    //移动完成后 鼠标的一个松开的事件
+                    document.onmouseup = function () {
+                        //当鼠标松开的时候 这个图片  被固定在当前的位置
+                        //取消鼠标的移动事件 和 ta被松开的事件
+                        document.onmousemove = null;
+                        document.onmouseup = null;
+                        //浏览器有一个默认行为 就是你选种的元素有一个拖拽的效果 拉到导航栏中可以搜索的那个
+                        //取消对ta的捕获
+                        obj.releaseCapture && obj.releaseCapture();
+                    };
+                    /*
+                     * 当我们拖拽一个网页中的内容时，浏览器会默认去搜索引擎中搜索内容，
+                     * 此时会导致拖拽功能的异常，这个是浏览器提供的默认行为，
+                     * 如果不希望发生这个行为，则可以通过return false来取消默认行为
+                     * 但是这招对IE8不起作用 IE8用这个obj.releaseCapture && obj.releaseCapture();
+                     */
+                    return false;
+                };
+            }
+
+            
+        </script>
+    </head>
+    <body>
+        <img id="img1" src="https://img1.baidu.com/it/u=407852637,3650486136&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1673456400&t=ff1c0869739e96245bc04ed6d8eb4fed" alt="测试图片">
+    </body>
+</html>
